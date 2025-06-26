@@ -1,0 +1,1 @@
+## LitGPT is not OpenAI API compatible, we need to use LitGPT API directly.

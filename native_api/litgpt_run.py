@@ -1,5 +1,7 @@
+import json
+import requests
+import time
 import logging
-from litgpt import LLM
 
 logging.basicConfig(
     level=logging.INFO,
@@ -7,30 +9,47 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+litgpt_api_base = "http://localhost:8000"
 
 def main():
 
-    logger.info("Staring the LitGPT server...")
-
-    # Load the model
-    llm = LLM.load("meta-llama/Llama-3.2-3B")
-
-    logger.info("Model is loaded and ready for use.")
-
     # Simple chat completion
-    logger.info("Sending: 'Hello, how are you?' to the model...")
-    response = llm.generate(
-        "Hello, how are you?",
+    logger.info("Sending 'hello, how are you?' to the model...")
+    start_time = time.time()
+    response = requests.post(
+        "http://localhost:8000/predict",
+        json={
+            "prompt": "Hello, how are you?",
+        },
+        stream = False
     )
-    print(response)
+    for line in response.iter_lines(decode_unicode=True):
+        if line:
+            chunck_response = json.loads(line)
+            print(chunck_response["output"], end="", flush=True)
+    end_time = time.time()
+    print()
+    logger.info("Response generated in %.4f seconds", end_time - start_time)
+
 
     # Simple chat completion streaming
     logger.info("Streaming response for: 'Hello, how are you?'")
-    for response_stream in llm.generate(
-        "Hello, how are you?",
-        stream=True
-    ):
-        print(response_stream, end="", flush=True)
+    start_time = time.time()
+    response = requests.post(
+        "http://localhost:8000/predict",
+        json={
+            "prompt": "Hello, how are you?",
+        },
+        stream = True
+    )
+    for line in response.iter_lines(decode_unicode=True):
+        if line:
+            chunck_response = json.loads(line)
+            print(chunck_response["output"], end="", flush=True)
+    end_time = time.time()
+    print()
+    logger.info("Streaming response generated in %.4f seconds", end_time - start_time)
+
 
 if __name__ == "__main__":
     main()
