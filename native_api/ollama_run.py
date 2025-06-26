@@ -74,9 +74,9 @@ def main():
         },
         stream=True
     )
-    for line in response.iter_lines():
+    for line in response.iter_lines(decode_unicode=True):
         if line:
-            chunk_response = json.loads(line.decode('utf-8'))
+            chunk_response = json.loads(line)
             print(chunk_response["message"]["content"], end='', flush=True)
     end_time = time.time()
     print()
