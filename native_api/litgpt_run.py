@@ -13,6 +13,19 @@ litgpt_api_base = "http://localhost:8000"
 
 def main():
 
+    # Load the model to ensure it is ready for use
+    logger.info("Starting the LitGPT server...")
+    start_time = time.time()
+    response = requests.get(
+        "http://localhost:8000/health",
+    )
+    end_time = time.time()
+    if response.status_code != 200:
+        logger.error("Failed to start the LitGPT server. Status code: %d", response.status_code)
+        return
+    logger.info("LitGPT server is running. Took %.4f seconds", end_time - start_time)
+
+
     # Simple chat completion
     logger.info("Sending 'hello, how are you?' to the model...")
     start_time = time.time()
